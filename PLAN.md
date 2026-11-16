@@ -240,27 +240,28 @@ python -m lab8.crash_test --count 20 --out reports/crash.json   # crash_safety =
 Hypothesis gợi ý: "Bỏ bước draft không đổi pass rate và ledger, nhưng giảm số model call và cost/success." Đây là giả thuyết cần kiểm, chưa phải kết luận.
 
 ### Việc cần làm
-- [ ] **Hỏi người dùng** có đồng ý R4 hay chọn câu R1–R3 khác trước khi làm.
-- [ ] Xác nhận workflow gốc **thực sự có** bước draft. Nếu không có thì không thành thí nghiệm — dừng và báo.
-- [ ] Tạo `src/bonus/__init__.py` và `src/bonus/workflow_no_draft.py` (bản sao workflow, khác đúng một biến: bỏ draft). Hai bản phải tự chứa logic, import được theo `bonus.workflow_no_draft:run_claim`.
-- [ ] Nếu Giai đoạn 0 cho thấy `check_submission` đòi `bonus_report.md` khi có `src/bonus/`, **dừng và hỏi người dùng** (tạo bonus_report theo khung cuối `docs/bonus_topics.md`, hay cách khác). Không sửa checker.
-- [ ] Chạy:
+- [x] Người dùng đã duyệt **R4 với phép thử bật/tắt draft** trước khi làm.
+- [x] Workflow gốc có một lần complete(... purpose="draft") ở finish_run, chỉ nhận status + proposal.
+- [x] Tạo `src/bonus/__init__.py` và `src/bonus/workflow_no_draft.py`: bản sao tự chứa logic, chỉ bỏ import/draft và đổi định danh shape/run_id. Không sửa workflow gốc hay registry.
+- [x] Không phát sinh điều kiện phải hỏi bonus report: checker không yêu cầu file đó khi chỉ có src/bonus. Đây là ablation cho research card; chưa đăng ký bài bonus lấy điểm.
+- [x] Đã chạy benchmark ablation (lệnh thực tế viết trên một dòng PowerShell):
   ```
   python -m lab8.benchmark --shapes workflow,workflow_no_draft \
     --extra-shape workflow_no_draft=bonus.workflow_no_draft:run_claim \
     --cases data/public_claims.jsonl --seeds 11,22,33,44,55 \
     --out reports/bonus_ablation.json
   ```
-- [ ] So sánh pass rate, ledger (refund giống nhau?), số model call, cost/success. Ghi kết luận: đúng / sai / không kết luận được — kèm số. Không kết luận vượt dữ liệu.
+- [x] Đã so sánh: hai bản đều 70/70 trial pass; 70 phép thử cặp có cùng ledger/audit/checkpoint và 3 crash window tương đương; model call 1 → 0; cost/success giảm 3.5942%. Kết luận và phạm vi ghi ở nhật ký.
 
 ### CỔNG KIỂM 5
 ```
 python -m pytest -q                              # vẫn xanh (không phá gì)
 python -m pytest -q -m student -o addopts=       # vẫn 0 failed
 ```
-- [ ] `reports/bonus_ablation.json` do lệnh tạo ra, không sửa tay.
-- [ ] Hai bản khác nhau đúng một biến (đã diff để chứng minh).
-- [ ] Commit: `bonus: workflow_no_draft ablation`. Ghi hash.
+- [x] `reports/bonus_ablation.json` do lab8.benchmark tạo, 2 shape × 14 claim × 5 seed = 140 trial; không sửa tay.
+- [x] Đã đọc diff: chỉ bỏ draft/import tương ứng và đổi định danh shape/run_id. Giữ nguyên mọi thao tác đọc, quyết định, ghi, xử lý crash và đóng connection.
+- [x] Cổng 5: host 391 passed (44.28s), student 248 passed (23.27s).
+- [x] Commit: `bonus: workflow_no_draft ablation` — `bb042dc`.
 
 ---
 
@@ -269,8 +270,8 @@ python -m pytest -q -m student -o addopts=       # vẫn 0 failed
 **Mục tiêu:** số liệu chính thức để viết ADR. **Chỉ chạy sau khi code ba shape đã commit và không còn thay đổi.** Nếu sửa code sau bước này, chạy lại toàn bộ giai đoạn này (C7: số chạy lại phải khớp file nộp).
 
 ### Việc cần làm
-- [ ] Kiểm `git status` sạch phần code; ghi `git rev-parse --short HEAD`.
-- [ ] Chạy:
+- [x] Phần code/input sạch trước khi chạy; HEAD `bb042dc`. Chỉ PLAN.md đang cập nhật; không có source mới chưa commit.
+- [x] Đã chạy hai lệnh chính thức trên code đã commit:
   ```
   python -m lab8.crash_test --count 20 --out reports/crash.json
   python -m lab8.benchmark --shapes workflow,single,orchestrator,swarm \
@@ -278,10 +279,12 @@ python -m pytest -q -m student -o addopts=       # vẫn 0 failed
     --out reports/benchmark.json
   ```
   (14 claim × 5 seed × 4 shape = 280 trial.)
-- [ ] Đọc `reports/benchmark.json` bằng script **tạm** (không commit) và lập bảng: pass rate, pass^5, seed min–max, variance, cost/success (mô phỏng, VND), mean/p95 steps cho 4 shape; lấy `run_id` dẫn chứng từ `trials[]`.
-- [ ] Ghi số thật của swarm (tài liệu dự kiến swarm sai T02 ở seed 55, pass rate ≈ 0,986, pass^5 ≈ 0,929 — chỉ để đối chiếu, **không dùng thay số chạy thật**).
-- [ ] Kiểm số `secret leak` và `approval bypass` của shape ứng viên (field đã xác định ở Giai đoạn 0).
-- [ ] **Nếu có `student_drop/`** (người dùng đã đặt vào `src/`, không commit):
+- [x] Đọc JSON bằng PowerShell tạm (ConvertFrom-Json), không thêm script phân tích vào repo; bảng và run_id thật ghi ở nhật ký.
+- [x] Swarm thực tế pass 69/70, pass^5 13/14; đúng một lỗi C-002 seed 55, reason `status resolved != denied`.
+- [x] Safety của ba ứng viên từ public_safety.json: mỗi shape 70 trial, các counter đều 0, complete=true. Bộ test safety cũng được chạy xanh lại ở Cổng 5; code ba shape không đổi.
+- [x] Đã kiểm điều kiện student_drop: cả hidden_claims.jsonl và hidden_world_state.json đều chưa có, nên bỏ qua self-check tùy chọn; chưa có hidden pass rate.
+
+  Khi được cung cấp đủ `student_drop/`, lệnh là:
   ```
   python -m lab8.benchmark --shapes workflow,single,orchestrator \
     --cases student_drop/hidden_claims.jsonl --world student_drop/hidden_world_state.json \
@@ -295,11 +298,12 @@ python -m pytest -q -m student -o addopts=       # vẫn 0 failed
 - Chỉ đề xuất dựa trên số đo; ghi rõ giới hạn (MockLLM, public chỉ 14 claim, latency `unavailable`).
 
 ### CỔNG KIỂM 6
-- [ ] `reports/benchmark.json` có đủ 4 shape, ≥ 10 claim, seed `11,22,33,44,55`.
-- [ ] `reports/crash.json` có `crash_safety` = `20/20`.
-- [ ] Bảng số liệu và run_id đã ghi vào NHẬT KÝ.
-- [ ] Đã trình **đề xuất shape + số liệu** cho người dùng. **`[DỪNG CHỜ NGƯỜI]` duyệt shape chọn** trước khi sang Giai đoạn 7.
-- [ ] Commit bằng chứng: `evidence: benchmark.json and crash.json`. Ghi hash (đây là **commit code + bằng chứng**, hash sẽ ghi vào ADR).
+- [x] Benchmark đủ 4 shape × 14 claim × 5 seed = 280 trial; seeds đúng 11,22,33,44,55. Controlled variables trùng ablation.
+- [x] Crash suite chính thức chạy lại: `crash_safety = 20/20`.
+- [x] Bảng số liệu, safety scope và run_id thật đã ghi vào NHẬT KÝ.
+- [x] Đã chuẩn bị đề xuất **workflow** theo số đo để trình người dùng.
+- [ ] **[DỪNG CHỜ NGƯỜI] Người dùng duyệt shape chọn** trước khi sang Giai đoạn 7. Chưa điền lựa chọn vào ADR.
+- [x] Hoàn tất commit bằng chứng Giai đoạn 6: `evidence: benchmark.json and crash.json` — `a551fd1`. Hash này sẽ ghi vào ADR sau khi người dùng duyệt shape.
 
 ---
 
@@ -423,8 +427,8 @@ Làm đúng thứ tự trong `SUBMISSION.md`.
 | 2 | ☑ Đạt | 16/11/2026 20:32 GMT+7 | Single 62 passed; workflow 62 passed; host 54 passed. Đã sửa bộ lọc -k theo ghi chú | `b3eb64c` |
 | 3 | ☑ Đạt | 16/11/2026 20:39 GMT+7 | Orchestrator 62 passed; student 248 passed; host 54 passed | `0e3287d` |
 | 4 | ☑ Cổng đạt | 16/11/2026 20:50 GMT+7 | Host 318 passed (264 test mới); student 248 passed; crash 20/20; safety 210 trial sạch; 9 CLI crash/resume đạt | Test `9523182`; evidence `46a1b31` |
-| 5 | ☐ | | | |
-| 6 | ☐ | | | |
+| 5 | ☑ Đạt; R4 đã được duyệt | 16/11/2026 21:05 GMT+7 | Ablation 140/140 trial pass; 70 cặp tiền/audit/checkpoint bằng nhau, 3 crash window tương đương; host 391 passed; student 248 passed | `bb042dc` |
+| 6 | ☑ Cổng kỹ thuật đạt; chờ người dùng duyệt shape | 16/11/2026 21:10 GMT+7 | Benchmark 280 trial: workflow/single/orchestrator 70/70, swarm 69/70; crash 20/20; thiếu student_drop nên chưa self-check hidden | Code `bb042dc`; evidence `a551fd1` |
 | 7 | ☐ | | | |
 | 8 | ☐ | | | |
 
@@ -500,10 +504,71 @@ Làm đúng thứ tự trong `SUBMISSION.md`.
 - Không phát hiện lỗi cần sửa ở code ba shape trong giai đoạn này. Diff so starter của metrics.py, durability.py, policy.py, check_submission.py, config và dữ liệu public vẫn rỗng. Không sửa tay JSON; hai file evidence đều do lệnh sinh.
 - Commit test: `9523182`. Commit evidence: `46a1b31` (crash.json + public_safety.json). PLAN.md được lưu bằng commit nhật ký sau evidence để ghi được hash thật.
 
-#### Điểm dừng hiện tại — trước khi làm Giai đoạn 5
+#### Điểm dừng trước Giai đoạn 5 — đã được người dùng duyệt
 
 - Giai đoạn 1–4 đã đạt cổng và có bằng chứng. Chưa tạo thư mục bonus, chưa chạy ablation hoặc benchmark chính thức Giai đoạn 6.
 - Theo mục Giai đoạn 5, phải hỏi người dùng đồng ý R4 hay chọn R1–R3 **trước khi làm**. Workflow gốc đã có đúng bước draft cần thiết tại finish_run; kết quả draft không đi vào tính quote hay ghi refund.
 - Đề xuất R4: giữ dữ liệu, seed, tool, giá, evaluator và logic hoàn tiền; tạo workflow_no_draft chỉ tắt phần soạn phản hồi. Nhãn shape/run_id của biến thể phải đổi để tách bằng chứng; đây là định danh thí nghiệm, không phải thay đổi chính sách.
 - Nơi xác thực trước khi duyệt: bước complete(... purpose="draft") trong workflow.py; yêu cầu giữ một biến trong research_card.md; công thức cost/success và giới hạn MockLLM trong docs/metrics.md.
 - Mục đích xác nhận: bảo đảm thí nghiệm khớp câu nghiên cứu và nguồn mà người dùng sẽ tự đọc; tránh làm ablation rồi phải thay lại. Giả thuyết chỉ là không đổi kết quả hoàn tiền, giảm model calls/cost; chưa có số đo để kết luận.
+
+#### Giai đoạn 5 — R4: bật/tắt draft, đã hoàn thành
+
+- Người dùng đã duyệt R4 trước khi tạo biến thể. Không sửa code ba shape đã hoàn thành, không sửa checker hay registry. Không tạo bonus_report.md; việc này phục vụ research card bắt buộc, chưa phải đăng ký bonus lấy điểm.
+- `src/bonus/workflow_no_draft.py` là bản sao tự chứa logic của workflow. Diff đã kiểm bằng `git diff --no-index -- src/lab8/shapes/workflow.py src/bonus/workflow_no_draft.py`: bỏ import complete, bỏ lệnh draft và event draft; chỉ đổi thêm nhãn shape/run_id để hai trace không ghi đè nhau.
+- 73 test mới trong `src/tests/test_workflow_ablation.py`: 70 cặp (14 claim × 5 seed) trên hai DB mới giống nhau và 3 crash window. So sánh status, proposal, refund_effects, committed_audit_count, error_reason, tool_calls, toàn bộ refund_ledger/audit_events/checkpoints, trace sau khi bỏ event draft. Các cặp đều bằng nhau; sau crash/resume vẫn một refund và một committed audit.
+- Lệnh benchmark thực tế (trong src):
+
+  ```powershell
+  python -m lab8.benchmark --shapes workflow,workflow_no_draft --extra-shape workflow_no_draft=bonus.workflow_no_draft:run_claim --cases data/public_claims.jsonl --seeds 11,22,33,44,55 --out reports/bonus_ablation.json
+  ```
+
+| Metric | Workflow có draft | Workflow không draft |
+| --- | ---: | ---: |
+| Trial pass | 70/70 | 70/70 |
+| Pass rate / pass^5 | 1 / 1 | 1 / 1 |
+| Seed min–max / variance | 1–1 / 0 | 1–1 / 0 |
+| Model calls trung bình | 1 | 0 |
+| Tool calls trung bình | 2.785714 | 2.785714 |
+| Cost/success, VND mô phỏng | 28.895714 | 27.857143 |
+| Mean/p95 trace events | 6.071429 / 7 | 5.071429 / 6 |
+
+- Chênh cost/success từ số chưa làm tròn: 1.038571 VND mô phỏng, giảm 3.594206%. Run ID minh họa: `R-workflow-C-014-s11` và `R-workflow_no_draft-C-014-s11`; cả hai pass, 3 tool call; cost tương ứng 31.06 và 30.
+- Kết luận: dữ liệu ủng hộ hypothesis trong phạm vi public/MockLLM: tắt draft giữ nguyên quyết định và tác động tiền, giảm một model call và chi phí. Thí nghiệm không đánh giá chất lượng giao tiếp khách hàng hoặc model sản xuất. Mean steps giảm vì bỏ một event trace; latency vẫn unavailable, không suy ra tốc độ thực.
+- Cổng 5: `391 passed, 248 deselected in 44.28s` cho host; `248 passed, 391 deselected in 23.27s` cho student. Log: `src/.venv/stage5-ablation.log`, `stage5-host.log`, `stage5-student.log`.
+- Commit `bb042dc` chứa biến thể, 73 test cặp và bonus_ablation.json. Nguồn/CLAIM/BOUNDARY của research card vẫn chờ tài liệu người dùng đã đọc ở Giai đoạn 7; chưa tự điền paper hoặc suy diễn nguồn.
+
+#### Giai đoạn 6 — benchmark chính thức, đề xuất chờ duyệt
+
+- Code snapshot trước khi chạy: `bb042dc`. Ba shape chính không có thay đổi sau các cổng 1–4. Source/input sạch, không có source chưa được commit.
+- Lệnh đã chạy trong src với .venv activate:
+
+  ```powershell
+  python -m lab8.crash_test --count 20 --out reports/crash.json
+  python -m lab8.benchmark --shapes workflow,single,orchestrator,swarm --cases data/public_claims.jsonl --seeds 11,22,33,44,55 --out reports/benchmark.json
+  ```
+
+- Đã kiểm JSON: 280 trial; đúng 4 tên shape; 14 claim; 5 seed đúng thứ tự; controlled_variables của benchmark và ablation giống nhau; model MockLLM, as_of 2026-11-15, giá mô phỏng và evaluator giữ nguyên. Input world/public/config không bị sửa so với starter.
+
+| Shape | Pass rate | Pass^5 | Seed min–max | Variance | Cost/success (VND mô phỏng) | Mean/p95 steps |
+| --- | ---: | ---: | --- | ---: | ---: | --- |
+| workflow | 1.000000 (70/70) | 1.000000 (14/14) | 1–1 | 0 | 28.895714 | 6.071429 / 7 |
+| single | 1.000000 (70/70) | 1.000000 (14/14) | 1–1 | 0 | 38.635714 | 9.785714 / 11 |
+| orchestrator | 1.000000 (70/70) | 1.000000 (14/14) | 1–1 | 0 | 58.740000 | 7.928571 / 9 |
+| swarm | 0.985714 (69/70) | 0.928571 (13/14) | 0.928571–1 | 0.000816326531 | 49.566957 | 2.800000 / 3 |
+
+- Run ID dẫn chứng: `R-workflow-C-014-s11`, `R-single-C-014-s11`, `R-orchestrator-C-014-s11`, `R-swarm-C-014-s11` đều pass. Trial fail duy nhất là `R-swarm-C-002-s55`, reason `status resolved != denied`; bốn seed khác của swarm đạt 1, seed 55 đạt 13/14.
+- Safety public riêng của workflow/single/orchestrator: mỗi shape 70 trial, secret_leak_count=0, pii_leak_count=0, context_leak_count=0, approval_bypass_count=0, ledger_violation_count=0, trace_error_count=0, error_count=0. Nguồn: public_safety.json sinh ở Giai đoạn 4; các test này chạy lại xanh ở Cổng 5 và code ba shape không đổi.
+- Crash suite chạy lại đạt 20/20 và file không đổi so với evidence trước. Cộng với T11/T12 và 9 CLI demo crash/resume đã đạt ở Giai đoạn 4 để xác minh an toàn của ba shape tự viết.
+- Không có student_drop/hidden_claims.jsonl và student_drop/hidden_world_state.json. Chưa chạy hidden self-check, không có hidden pass rate hoặc counter hidden. Khi giảng viên phát, phải chạy self-check theo lệnh trong kế hoạch.
+- **Đề xuất, chưa phải lựa chọn được duyệt:** workflow. Đây là shape ít tự chủ nhất, có cùng độ đúng/độ ổn định public với hai shape tự viết còn lại và chi phí thấp nhất trong 4 shape. Cost/success thấp hơn single 25.209835%, thấp hơn orchestrator 50.807432%.
+- workflow_no_draft chỉ là biến thể ablation. ADR nhận đúng một trong workflow/single/orchestrator/swarm; không ghi tên biến thể vào Shape chọn và không thay code workflow để thay đổi bằng chứng đã đo.
+- Giới hạn: 14 claim synthetic, 5 seed, MockLLM; chi phí mô phỏng; latency unavailable. Steps là số event trace và cách ghi event khác nhau theo shape, nên số steps thấp của swarm không chứng minh latency thấp. Swarm có điểm yếu được cài có chủ đích; dữ liệu không chứng minh multi-agent luôn kém hơn. Ngưỡng hidden ≥0.75 chưa thể xác minh từ public.
+- Log: `src/.venv/stage6-crash.log`, `stage6-benchmark.log`. Hai JSON do công cụ sinh; không sửa tay. Commit code + evidence chính thức: `a551fd1`.
+
+#### Điểm dừng hiện tại — duyệt shape trước Giai đoạn 7
+
+- Cần người dùng duyệt đề xuất workflow hoặc chọn một trong ba shape chính khác. Điều này do Cổng 6 yêu cầu, không phải lỗi kỹ thuật hoặc thiếu quyền chạy test.
+- Nơi xác thực: by_shape và trials trong reports/benchmark.json; counter public trong reports/public_safety.json; crash_safety trong reports/crash.json; so sánh với tiêu chí ít tự chủ nhất trong README/RUBRIC và các nhãn hợp lệ trong mẫu ADR.
+- Việc xác nhận quyết định shape nào được chấm hidden và nội dung lập luận của ADR. Các báo cáo nhóm, research card, TEAM và báo cáo cá nhân vẫn để Giai đoạn 7; chưa tự điền danh tính, nguồn hoặc tự đánh giá.
+- Chưa push. Người dùng vẫn tự push và nộp LMS ở Giai đoạn 8 theo kế hoạch.
