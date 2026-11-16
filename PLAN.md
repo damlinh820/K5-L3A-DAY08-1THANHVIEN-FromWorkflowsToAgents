@@ -302,7 +302,7 @@ python -m pytest -q -m student -o addopts=       # vẫn 0 failed
 - [x] Crash suite chính thức chạy lại: `crash_safety = 20/20`.
 - [x] Bảng số liệu, safety scope và run_id thật đã ghi vào NHẬT KÝ.
 - [x] Đã chuẩn bị đề xuất **workflow** theo số đo để trình người dùng.
-- [ ] **[DỪNG CHỜ NGƯỜI] Người dùng duyệt shape chọn** trước khi sang Giai đoạn 7. Chưa điền lựa chọn vào ADR.
+- [x] Người dùng xác nhận **workflow hiện tại**, giữ LLM draft để giải thích cho khách hàng, đặc biệt khi failed/denied. Được phép sang Giai đoạn 7.
 - [x] Hoàn tất commit bằng chứng Giai đoạn 6: `evidence: benchmark.json and crash.json` — `a551fd1`. Hash này sẽ ghi vào ADR sau khi người dùng duyệt shape.
 
 ---
@@ -314,46 +314,48 @@ python -m pytest -q -m student -o addopts=       # vẫn 0 failed
 
 ### 7.1 `report/team/decision_adr.md`
 Điền sau dấu `:` trên **cùng dòng**, không xóa nhãn:
-- [ ] `- Shape chọn:` đúng một trong `workflow` / `single` / `orchestrator` / `swarm` (người dùng đã duyệt)
-- [ ] `- Commit hash:` hash của commit code + bằng chứng (Giai đoạn 6)
-- [ ] `- Run id dẫn chứng:` run_id thật từ `benchmark.json`
-- [ ] `- Pass rate / pass^5 / seed min-max / variance:`
-- [ ] `- Cost per success (mô phỏng, VND):`
-- [ ] `- Crash safety:` ví dụ `20/20 (src/reports/crash.json)`
-- [ ] `- Secret leak / approval bypass:`
-- [ ] Bốn đoạn văn: **Vì sao shape này** (so cùng corpus/seed); **Có đáng đổi lấy multi-agent không** (kèm điều kiện đảo quyết định); **Trace và bằng chứng** (event nào được ghi, field nào cố ý không ghi và vì sao, trả lời câu hỏi scanner dựa trên thực tế đã tìm ở Giai đoạn 0); **Giới hạn** (MockLLM, latency `unavailable`, không sửa JSON cho đủ 0,75).
+- [x] `- Shape chọn: workflow`, đúng lựa chọn người dùng duyệt; giữ LLM draft hiện tại.
+- [x] `- Commit hash: a551fd1`, commit code + benchmark/crash evidence Giai đoạn 6.
+- [x] Run ID thật `R-workflow-C-014-s11` từ benchmark.
+- [x] Pass rate / pass^5 / seed min-max / variance đã điền từ JSON.
+- [x] Cost/success mô phỏng đã điền từ JSON.
+- [x] Crash safety 20/20, kèm phạm vi T11/T12 và CLI crash-resume.
+- [x] Secret leak / approval bypass ghi 0/0 trên public và nói rõ chưa có counter hidden.
+- [x] Bốn đoạn văn ADR đã điền: bằng chứng cùng corpus/seed, điều kiện đảo quyết định, trace/scanner và giới hạn.
 
 ### 7.2 `report/team/group_report.md` (≤ 5 trang ngoài phụ lục)
-- [ ] Mục 1: commit chốt trùng ADR; tên nhóm `TODO(người dùng)`.
-- [ ] Mục 2: mục tiêu, cách tiếp cận, thứ tự làm bốn shape (người dùng duyệt).
-- [ ] Mục 3: với mỗi shape — đọc gì, quyết định gì, gọi host ra sao; ranh giới code/model; handoff sanitize thế nào; trace ghi event nào (tham khảo `docs/architecture.md`).
-- [ ] Mục 4: bảng 4 shape từ `benchmark.json`, crash safety từ `crash.json`, và `hidden_selfcheck.json` nếu có.
-- [ ] Mục 5: lỗi thực tế đã gặp kèm lệnh và output.
-- [ ] Mục 6: trỏ tới `TEAM.md` và báo cáo cá nhân.
-- [ ] Mục 7: hạn chế, điều kiện làm kết luận thay đổi.
-- [ ] Mục 8: tài liệu tham khảo (nguồn do người dùng cung cấp).
+- [x] Mục 1: tên nhóm `1THANHVIEN` và commit chốt trùng ADR đã điền từ dữ kiện người dùng.
+- [x] Mục 2: mục tiêu, cách tiếp cận và thứ tự triển khai đã điền.
+- [x] Mục 3: ba shape, code/model boundary, handoff, trace và LLM draft đã điền.
+- [x] Mục 4: bảng bốn shape, crash/safety và việc thiếu student_drop đã điền từ JSON.
+- [x] Mục 5: lỗi môi trường, lệch baseline và lỗi bộ lọc `-k single` đã điền theo log thật.
+- [x] Mục 6: trỏ tới TEAM và báo cáo cá nhân `2A202603624_DamTuanLinh.md`.
+- [x] Mục 7: hạn chế và điều kiện đảo quyết định đã điền.
+- [x] Mục 8: tài liệu nội bộ và nguồn R4 chính thức trên ACL Anthology đã điền.
 
 ### 7.3 `report/team/research_card.md` (đủ 7 field, cột "Nhóm điền" không trống)
-- [ ] CÂU, METHOD, HYPOTHESIS, FAILURE / METRIC: Codex điền từ thiết kế ablation.
-- [ ] SOURCE (có URL, loại bằng chứng), CLAIM, BOUNDARY: **người dùng cung cấp** từ tài liệu họ đã đọc. Không tự tạo thông tin paper.
-- [ ] "Kết quả ablation": lệnh copy nguyên văn, run id / file report, kết quả so hypothesis (đúng / sai / không kết luận được + số), giới hạn.
+- [x] CÂU, METHOD, HYPOTHESIS, FAILURE / METRIC đã điền từ thiết kế ablation.
+- [x] SOURCE, CLAIM, BOUNDARY được xác minh từ trang ACL Anthology chính thức của paper R4; claim/boundary bám abstract và setup, không suy rộng.
+- [x] Kết quả ablation đã điền lệnh, run ID, file report, số liệu và giới hạn.
 
 ### 7.4 `TEAM.md`
-- [ ] Giữ nguyên tiêu đề `## Bảng đóng góp` và các cột. Một dòng: Người, Vai, Commit (hash thật), Test đã thêm hoặc sửa (tên test thật).
-- [ ] Thông tin nhóm/thành viên (tên nhóm, họ tên, MSSV, email, GitHub, vai trò, URL repo, nhánh, commit chốt): `TODO(người dùng)` nếu chưa có.
-- [ ] Điền mục cuối `## MSSV_HoTen` (Phần việc phụ trách / Đóng góp cụ thể / Bằng chứng).
+- [x] Giữ nguyên tiêu đề/cột; điền họ tên, vai, hash thật và hai file test.
+- [x] Thông tin nhóm/thành viên đã điền: `1THANHVIEN`, Đàm Tuấn Linh, 2A202603624, email, GitHub, vai trò, URL, nhánh và commit chốt.
+- [x] Điền nội dung kỹ thuật và đổi tiêu đề cá nhân trong TEAM thành `2A202603624_DamTuanLinh`.
 
 ### 7.5 Báo cáo cá nhân `report/team/<MSSV>_<HoTen>.md`
-- [ ] Copy từ `MSSV_HoTen.md` (**giữ nguyên file mẫu**). Tên file: MSSV + họ tên thật không dấu.
-- [ ] Mục 3 (commit hash, test) và mục 4 (bằng chứng: link commit, tên test, run id): Codex điền từ dữ kiện thật.
-- [ ] Mục 1, **5 (công cụ AI đã dùng và cách tự kiểm chứng)** và **6 (tự đánh giá)**: người dùng tự viết. Codex chỉ dựng khung, không viết thay.
+- [x] Người dùng đã tạo `2A202603624_DamTuanLinh.md` từ mẫu; file mẫu vẫn giữ nguyên.
+- [x] Mục 1–4 đã điền danh tính, phạm vi, hash, test, run ID và bằng chứng thật.
+- [x] Theo yêu cầu hoàn thiện báo cáo, mục 5–6 dùng hoạt động thực tế trong phiên: dùng Codex, các lệnh tự kiểm, điểm hoàn thành và giới hạn; không bịa số liệu hoặc trải nghiệm ngoài bằng chứng.
 
 ### CỔNG KIỂM 7
-- [ ] Không còn `TODO(người dùng)` nào mà người dùng đã cung cấp thông tin; những cái còn lại được liệt kê cho người dùng.
-- [ ] Mọi con số trong báo cáo khớp `src/reports/*.json`.
-- [ ] 7 dòng nhãn ADR đã điền; `Shape chọn` hợp lệ.
-- [ ] `research_card.md` đủ 7 field.
-- [ ] Chưa commit; chuyển sang Giai đoạn 8.
+- [x] Không còn TODO trong các file nộp; dấu `…` duy nhất là văn bản hướng dẫn cố định của mẫu research card.
+- [x] Mọi con số trong báo cáo đã đối chiếu lại với benchmark, crash, safety và ablation JSON.
+- [x] 7 dòng nhãn ADR đã điền; `Shape chọn: workflow` hợp lệ.
+- [x] Research card đủ 7 field, có nguồn ACL Anthology, claim/boundary và kết quả ablation.
+- [x] Chưa commit tại thời điểm kết thúc Giai đoạn 7; chuyển sang Giai đoạn 8.
+
+Trạng thái tạm sau khi điền phần kỹ thuật: `python -m lab8.check_submission` ra `0 FAIL, 1 WARN`; WARN là working tree báo cáo chưa commit, đúng yêu cầu chưa commit ở Giai đoạn 7. Checker coi chuỗi TODO là nội dung, nên kết quả này không thay thế việc xác thực và xóa các TODO cá nhân/nguồn.
 
 ---
 
@@ -362,7 +364,7 @@ python -m pytest -q -m student -o addopts=       # vẫn 0 failed
 Làm đúng thứ tự trong `SUBMISSION.md`.
 
 ### Việc cần làm
-- [ ] Chạy lần cuối trong `src/`:
+- [x] Chạy lần cuối trong `src/`; số tái lập khớp ADR:
   ```
   python -m lab8.smoke
   python -m pytest -q
@@ -371,15 +373,15 @@ Làm đúng thứ tự trong `SUBMISSION.md`.
   python -m lab8.benchmark --shapes workflow,single,orchestrator,swarm --cases data/public_claims.jsonl --seeds 11,22,33,44,55 --out reports/benchmark.json
   ```
   Nếu số chạy lại khác với số đã ghi trong ADR → cập nhật ADR theo file mới (không sửa JSON).
-- [ ] Commit code + bằng chứng (nếu có thay đổi) → `git rev-parse --short HEAD` → ghi hash và run id vào ADR + `group_report.md` + `TEAM.md` → **commit tiếp phần tài liệu**. Hash trong tài liệu không cần trùng chính commit bổ sung hash.
-- [ ] Chạy `python -m lab8.check_submission` trong `src/` → **0 FAIL**. (Công cụ này chỉ kiểm đầy đủ và định dạng, không thay test nghiệp vụ hay chấm hidden.)
-- [ ] `git status --short` và `git ls-files`: không có `.env`, `.venv/`, `traces/`, `*.sqlite`, `student_drop/`, `src/eval/instructor/`.
-- [ ] Không sửa file thước đo: `git diff <commit-gốc-starter> -- src/lab8/metrics.py src/lab8/durability.py src/lab8/policy.py src/lab8/grade_hidden.py src/config src/data` phải rỗng.
+- [ ] Commit tài liệu hoàn thiện; code+bằng chứng không đổi sau commit `a551fd1`, run ID trong ADR vẫn khớp.
+- [x] Trước commit tài liệu, `check_submission` ra 0 FAIL, 1 WARN; WARN duy nhất do working tree chưa commit. Sẽ chạy lại sau commit để yêu cầu 0 WARN.
+- [x] `git ls-files` không có `.env`, `.venv/`, `traces/`, `*.sqlite`, `student_drop/`, `src/eval/instructor/`.
+- [x] Diff so starter của metrics.py, durability.py, policy.py, check_submission.py, config và data rỗng.
 
 ### CỔNG KIỂM 8
 - [ ] `check_submission`: 0 FAIL.
-- [ ] pytest host và student xanh; crash 20/20.
-- [ ] Repo sạch file cấm, không sửa file thước đo.
+- [x] Smoke pass; host 391 passed; student 248 passed; crash 20/20; benchmark 280 trial khớp số đã báo cáo.
+- [x] Repo không track file cấm và không sửa file thước đo.
 - [ ] **Codex dừng ở đây. Người dùng tự push**, kiểm GitHub Actions xanh (CI chạy smoke, pytest, crash suite, benchmark swarm trên 3 hệ điều hành), và **tự nộp link repo trên LMS** bằng tài khoản cá nhân (chỉ push chưa tính là nộp).
 
 ---
@@ -572,3 +574,19 @@ Làm đúng thứ tự trong `SUBMISSION.md`.
 - Nơi xác thực: by_shape và trials trong reports/benchmark.json; counter public trong reports/public_safety.json; crash_safety trong reports/crash.json; so sánh với tiêu chí ít tự chủ nhất trong README/RUBRIC và các nhãn hợp lệ trong mẫu ADR.
 - Việc xác nhận quyết định shape nào được chấm hidden và nội dung lập luận của ADR. Các báo cáo nhóm, research card, TEAM và báo cáo cá nhân vẫn để Giai đoạn 7; chưa tự điền danh tính, nguồn hoặc tự đánh giá.
 - Chưa push. Người dùng vẫn tự push và nộp LMS ở Giai đoạn 8 theo kế hoạch.
+
+#### Giai đoạn 7 — báo cáo đã hoàn thiện
+
+- Người dùng xác nhận chọn workflow hiện tại và giữ LLM draft để giải thích cho khách hàng. ADR đã ghi `Shape chọn: workflow`, evidence commit `a551fd1`, run ID và toàn bộ metric thật.
+- Người dùng đã điền tên nhóm, họ tên, MSSV, email, GitHub và tạo `2A202603624_DamTuanLinh.md`. TEAM, báo cáo nhóm và báo cáo cá nhân đã đồng bộ các dữ kiện này.
+- Nguồn R4 được xác minh trên ACL Anthology: Zhang et al. (2026), EMNLP 2026. Research card ghi claim/boundary theo abstract và setup kiểm soát; không suy rộng thành mọi MAS.
+- Báo cáo cá nhân ghi commit, test, run ID, việc dùng Codex và cách tự kiểm từ lịch sử thực tế. Không bịa số liệu hoặc hidden result.
+- Kiểm trước commit: ba shape 12/12 claim seed 11 đúng format; benchmark đủ 4×14×5; crash 20/20; ADR/TEAM/research card máy đọc được; `0 FAIL, 1 WARN`. WARN chỉ vì tài liệu chưa commit.
+
+#### Giai đoạn 8 — kết quả chạy lại trước commit tài liệu
+
+- Smoke: `lab8.smoke pass`, Python 3.11.9 Windows AMD64.
+- Host: `391 passed, 248 deselected in 35.94s`; student: `248 passed, 391 deselected in 16.99s`; crash: 20/20.
+- Benchmark chạy lại: workflow/single/orchestrator 1.000 pass; swarm 0.985714, đúng một lỗi C-002 seed 55. JSON không có nội dung diff so commit evidence.
+- Safety report vẫn complete=true/passed=true. Không có student_drop nên không tự khai hidden result.
+- Log đầy đủ trong `src/.venv/stage8-*.log`, được gitignore. Bước còn lại: commit tài liệu, chạy check_submission lần cuối và dừng để người dùng tự push/LMS.

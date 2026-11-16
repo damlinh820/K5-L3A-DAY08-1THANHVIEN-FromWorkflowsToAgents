@@ -2,17 +2,16 @@
 
 ## Thông tin nhóm
 
-- Tên nhóm:
+- Tên nhóm: `1THANHVIEN`
 - Lớp: L3A
-- Repo nhóm: `K5-L3A-DAY08-TenNhom-FromWorkflowsToAgents` (xem [SUBMISSION.md](SUBMISSION.md))
-- URL repo, nhánh nộp, commit chốt:
+- Repo nhóm: `K5-L3A-DAY08-1THANHVIEN-FromWorkflowsToAgents`
+- URL repo, nhánh nộp, commit chốt: `https://github.com/damlinh820/K5-L3A-DAY08-1THANHVIEN-FromWorkflowsToAgents`, `main`, `a551fd1`
 
 ## Thành viên
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1 |        |      |       |        |         |
-|   2 |        |      |       |        |         |
+|   1 | Đàm Tuấn Linh | 2A202603624 | 26ai.linhdt3@vinuni.edu.vn | damlinh820 | Implementation, safety, evaluation, report |
 
 Gợi ý chia vai:
 
@@ -25,7 +24,7 @@ Gợi ý chia vai:
 
 | Người | Vai | Commit | Test đã thêm hoặc sửa |
 | --- | --- | --- | --- |
-| | | | |
+| Đàm Tuấn Linh | Implementation, safety, evaluation, report | `b892e6b`, `b3eb64c`, `0e3287d`, `9523182`, `bb042dc`, `a551fd1` | `tests/test_shape_safety.py`; `tests/test_workflow_ablation.py` |
 
 ## Cá nhân
 
@@ -39,16 +38,16 @@ Ví dụ: `report/team/20241234_NguyenVanAn.md`.
 
 Sao chép mục dưới đây cho từng thành viên.
 
-## MSSV_HoTen
+## 2A202603624_DamTuanLinh
 
 ### Phần việc phụ trách
 
--
+- Workflow, single ReAct, orchestrator/handoff; durability, approval, trace; benchmark, R4 ablation và báo cáo.
 
 ### Đóng góp cụ thể
 
--
+- Triển khai ba shape; thêm 264 test safety và 73 test ablation; tạo benchmark/crash/safety reports bằng CLI.
 
 ### Bằng chứng
 
--
+- Các commit và test trong bảng đóng góp; run ID `R-workflow-C-014-s11`; benchmark 280 trial và crash 20/20.

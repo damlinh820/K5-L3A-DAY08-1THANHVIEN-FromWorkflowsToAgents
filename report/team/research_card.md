@@ -17,19 +17,19 @@ Phần này nối tiếp phần mini research ở buổi lý thuyết (slide 62�
 
 | Field | Hướng dẫn | Nhóm điền |
 | --- | --- | --- |
-| CÂU | R1 / R2 / R3 / R4 | |
-| SOURCE | Paper/blog, năm, URL, loại bằng chứng (benchmark, production report, blog kinh nghiệm) | |
-| CLAIM | Một kết luận gốc của nguồn. Không viết rộng hơn phạm vi paper | |
-| BOUNDARY | Model / dataset / setup giới hạn kết luận đó | |
-| HYPOTHESIS | Nếu đổi shape A→B (hoặc bật/tắt một thành phần), metric X sẽ đổi theo hướng nào, khoảng bao nhiêu | |
-| METHOD | Biến giữ cố định: model, tools, seed, corpus, giá, evaluator. Biến duy nhất được thay đổi: … | |
-| FAILURE / METRIC | Một lỗi dự kiến và cách đo nó: pass rate, pass^5, variance, cost/success, leak, bypass | |
+| CÂU | R1 / R2 / R3 / R4 | R4 · Evaluation confounders |
+| SOURCE | Paper/blog, năm, URL, loại bằng chứng (benchmark, production report, blog kinh nghiệm) | Zhang et al., 2026, *Rethinking the Evaluation of Efficiency Methods for Multi-Agent Systems*, EMNLP 2026; paper thực nghiệm/benchmark có kiểm soát; https://aclanthology.org/2026.emnlp-main.798/ |
+| CLAIM | Một kết luận gốc của nguồn. Không viết rộng hơn phạm vi paper | Nhiều mức tăng hiệu quả MAS được báo cáo phụ thuộc setup; khi prompt, topology ban đầu và runtime không được kiểm soát, cải thiện có thể đến từ structural collapse, tool pathway bị vô hiệu hóa hoặc baseline mà random pruning vẫn giữ accuracy, thay vì phương pháp cấu trúc thực sự tốt hơn. |
+| BOUNDARY | Model / dataset / setup giới hạn kết luận đó | Kết luận thuộc các phương pháp tối ưu hiệu quả LLM-based MAS được paper khảo sát trên diagnostic benchmark của họ, với shared backbone model, agent registry và runtime; các biến topology, scale, depth và tool use được kiểm soát. Không suy rộng thành mọi multi-agent system hoặc mọi task sản xuất. |
+| HYPOTHESIS | Nếu đổi shape A→B (hoặc bật/tắt một thành phần), metric X sẽ đổi theo hướng nào, khoảng bao nhiêu | Bỏ đúng bước MockLLM draft khỏi workflow sẽ giữ nguyên pass rate, ledger và safety; model calls giảm 1 mỗi trial và cost/success giảm, chưa giả định mức giảm trước khi đo. |
+| METHOD | Biến giữ cố định: model, tools, seed, corpus, giá, evaluator. Biến duy nhất được thay đổi: … | Giữ MockLLM, tool, 14 claim, seed 11/22/33/44/55, pricing, evaluator, policy và logic tiền; biến duy nhất là bật/tắt một lần `complete(... purpose="draft")`. Chạy hai DB mới cho từng cặp và so toàn bộ ledger/audit/checkpoint. |
+| FAILURE / METRIC | Một lỗi dự kiến và cách đo nó: pass rate, pass^5, variance, cost/success, leak, bypass | Rủi ro: bỏ draft vô tình đổi quyết định hoặc crash path. Đo pass rate, pass^5, seed variance, model/tool calls, cost/success, trace steps; test theo cặp status/proposal/refund/ledger/audit/checkpoint và ba crash window. |
 
 ## Kết quả ablation
 
-- Lệnh đã chạy (copy nguyên văn):
-- Run id / file report:
-- Kết quả so với hypothesis (đúng / sai / không kết luận được), kèm số liệu:
-- Giới hạn: MockLLM không phải model sản xuất, latency là `unavailable`.
+- Lệnh đã chạy (copy nguyên văn): `python -m lab8.benchmark --shapes workflow,workflow_no_draft --extra-shape workflow_no_draft=bonus.workflow_no_draft:run_claim --cases data/public_claims.jsonl --seeds 11,22,33,44,55 --out reports/bonus_ablation.json`
+- Run id / file report: `R-workflow-C-014-s11`, `R-workflow_no_draft-C-014-s11`; `src/reports/bonus_ablation.json`
+- Kết quả so với hypothesis (đúng / sai / không kết luận được), kèm số liệu: Ủng hộ trên public. Hai bản đều pass 70/70, pass^5 14/14, variance 0; 70 cặp có ledger/audit/checkpoint giống nhau và ba crash window tương đương. Model calls trung bình 1→0; cost/success 28.895714→27.857143 VND mô phỏng, giảm 3.594206%; mean/p95 trace events 6.071429/7→5.071429/6.
+- Giới hạn: MockLLM không phải model sản xuất, latency là `unavailable`; chỉ 14 claim synthetic × 5 seed. Thí nghiệm không đo chất lượng lời giải thích cho khách hàng, nên kết quả không đủ để khuyến nghị bỏ draft trong sản phẩm.
 
 Muốn đi xa hơn một ablation để lấy điểm cộng thì xem [docs/bonus_topics.md](../../docs/bonus_topics.md).
