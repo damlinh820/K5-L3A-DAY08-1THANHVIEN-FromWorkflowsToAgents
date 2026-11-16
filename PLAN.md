@@ -373,16 +373,16 @@ Làm đúng thứ tự trong `SUBMISSION.md`.
   python -m lab8.benchmark --shapes workflow,single,orchestrator,swarm --cases data/public_claims.jsonl --seeds 11,22,33,44,55 --out reports/benchmark.json
   ```
   Nếu số chạy lại khác với số đã ghi trong ADR → cập nhật ADR theo file mới (không sửa JSON).
-- [ ] Commit tài liệu hoàn thiện; code+bằng chứng không đổi sau commit `a551fd1`, run ID trong ADR vẫn khớp.
+- [x] Commit tài liệu hoàn thiện `0bfe186`; code+bằng chứng không đổi sau commit `a551fd1`, run ID trong ADR vẫn khớp.
 - [x] Trước commit tài liệu, `check_submission` ra 0 FAIL, 1 WARN; WARN duy nhất do working tree chưa commit. Sẽ chạy lại sau commit để yêu cầu 0 WARN.
 - [x] `git ls-files` không có `.env`, `.venv/`, `traces/`, `*.sqlite`, `student_drop/`, `src/eval/instructor/`.
 - [x] Diff so starter của metrics.py, durability.py, policy.py, check_submission.py, config và data rỗng.
 
 ### CỔNG KIỂM 8
-- [ ] `check_submission`: 0 FAIL.
+- [x] `check_submission`: 0 FAIL, 0 WARN trên commit tài liệu `0bfe186`.
 - [x] Smoke pass; host 391 passed; student 248 passed; crash 20/20; benchmark 280 trial khớp số đã báo cáo.
 - [x] Repo không track file cấm và không sửa file thước đo.
-- [ ] **Codex dừng ở đây. Người dùng tự push**, kiểm GitHub Actions xanh (CI chạy smoke, pytest, crash suite, benchmark swarm trên 3 hệ điều hành), và **tự nộp link repo trên LMS** bằng tài khoản cá nhân (chỉ push chưa tính là nộp).
+- [x] **Codex dừng sau khi ghi nhận cổng cuối. Người dùng tự push**, kiểm GitHub Actions xanh và **tự nộp link repo trên LMS** bằng tài khoản cá nhân.
 
 ---
 
@@ -590,3 +590,4 @@ Làm đúng thứ tự trong `SUBMISSION.md`.
 - Benchmark chạy lại: workflow/single/orchestrator 1.000 pass; swarm 0.985714, đúng một lỗi C-002 seed 55. JSON không có nội dung diff so commit evidence.
 - Safety report vẫn complete=true/passed=true. Không có student_drop nên không tự khai hidden result.
 - Log đầy đủ trong `src/.venv/stage8-*.log`, được gitignore. Bước còn lại: commit tài liệu, chạy check_submission lần cuối và dừng để người dùng tự push/LMS.
+- Commit báo cáo: `0bfe186`. Check sau commit: ba shape 12/12 claim seed 11, benchmark 4×14×5, crash 20/20, ADR workflow, TEAM một thành viên, research card đủ; tổng `0 FAIL, 0 WARN`.
